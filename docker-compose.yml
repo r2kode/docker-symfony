@@ -2,7 +2,8 @@ version: '2'
 
 services:
     db:
-        image: mysql
+        image: mysql:5.7
+        container_name: ${PROJECT_NAME}_db
         volumes:
             - "./.data/db:/var/lib/mysql"
         environment:
@@ -11,6 +12,7 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     php:
+        container_name: ${PROJECT_NAME}_php
         build:
             context: php7-fpm
             args:
@@ -19,6 +21,7 @@ services:
             - ${SYMFONY_APP_PATH}:/var/www/symfony
             - ./logs/symfony:/var/www/symfony/app/logs
     nginx:
+        container_name: ${PROJECT_NAME}_webserver
         build: nginx
         ports:
             - 80:80
@@ -27,6 +30,7 @@ services:
         volumes:
             - ./logs/nginx/:/var/log/nginx
     elk:
+        container_name: ${PROJECT_NAME}_elk
         image: willdurand/elk
         ports:
             - 81:80
@@ -36,3 +40,8 @@ services:
         volumes_from:
             - php
             - nginx
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: ${PROJECT_NAME}_pma
+        ports:
+            - "8010:80"
